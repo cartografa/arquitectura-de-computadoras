@@ -6,6 +6,7 @@
 ORG 1000h
 CAD DB "aBcDE1#!"
     DB 00h
+RES ?
 
 ORG 3000h
 CONTAR_MIN: MOV DX, 0   ; REGISTRO CONTADOR
@@ -13,10 +14,10 @@ CONTAR_MIN: MOV DX, 0   ; REGISTRO CONTADOR
                   CMP AH, 00h        ; comparo con el 00 (final de la cadena)
                   JZ FIN
                   CMP AH, 61h        ; comparo con 61h (letra 'a')
-                  JNS MAYOR_61
-                  MAYOR_61: CMP AH, 7Ah    ; si no es negativo comparo con 7Ah (letra 'z')
-                  JS MENOR_7A 
-                  MENOR_7A: INC DX          ; si es negativo incremento contador
+                  JS  INCBX          ; si el resultado es negativo incremento BX y loopeo
+                  CMP AH, 7Ah        ; si no es negativo comparo con 7Ah (letra 'z')
+                  JNS INCBX          ; si el resultado es positivo incremento BX y loopeo 
+                  INC DX             ; si es negativo incremento contador
                   INC BX             ; incremento la dirección que guarda BX
             JMP LOOP 
 FIN: RET
@@ -24,5 +25,6 @@ FIN: RET
 ORG 2000h
 MOV BX, OFFSET CAD
 CALL CONTAR_MIN
+MOV RES, DX
 HLT 
 END 
